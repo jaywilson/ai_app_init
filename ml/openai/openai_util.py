@@ -13,9 +13,14 @@ def completion(content: str) -> str:
 
     {content}
 
-    Write the frontend in React. Write the backend server using Ktor.
+    Build the app frontend using React. Build the app backend using Kotlin and Ktor.
+    Create a database schema using Postgres.
 
-    Output all code files in one JSON structure. The structure should be a list of objects. Each object should have a "filename" attribute and a "contents" attribute.
+    The app frontend event handlers should post to the backend routes defined in Ktor.
+    The backend server routes to save data in the Postgres database.
+
+    Output all code files in one JSON structure. The structure should be a list of objects.
+    Each object should have a "filename" attribute and a "contents" attribute.
     """
 
     print(f"Query: {query}")
