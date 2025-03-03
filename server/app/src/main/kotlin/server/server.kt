@@ -12,11 +12,16 @@ import io.ktor.server.plugins.contentnegotiation.*
 import io.ktor.serialization.kotlinx.json.*
 import openai.getCompletionResponse
 
-fun main() {
-    // Set up and start the Ktor server
-    embeddedServer(Netty, port = 8080, host = "0.0.0.0") {
-        module()
-    }.start(wait = true)
+class MainApp {
+    companion object {
+        @JvmStatic
+        fun main(args: Array<String>) {
+            // Set up and start the Ktor server
+            embeddedServer(Netty, port = 8080, host = "0.0.0.0") {
+                module()
+            }.start(wait = true)
+        }
+    }
 }
 
 fun Application.module() {
