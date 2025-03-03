@@ -33,10 +33,6 @@ class RequestHandler(BaseHTTPRequestHandler):
                 # Invalid JSON in the request body
                 self._send_json_response({"error": "Invalid JSON"}, 400)
 
-            except Exception as e:
-                # Handle unexpected errors
-                self._send_json_response({"error": str(e)}, 500)
-
         else:
             # Return a 404 Not Found for unknown endpoints
             self._send_json_response({"error": "Endpoint not found"}, 404)

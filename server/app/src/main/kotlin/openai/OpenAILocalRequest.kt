@@ -21,6 +21,9 @@ fun getCompletionResponse(content: String): String {
             install(ContentNegotiation) {
                 json() // Add JSON serialization support
             }
+            engine {
+                requestTimeout = 300000 // Set request timeout to 300 seconds
+            }
         }
 
         // Define the endpoint URL
@@ -30,8 +33,6 @@ fun getCompletionResponse(content: String): String {
         val requestBody = CompletionRequest(
             content = content
         )
-
-        print("about to try for response")
 
         client.use { c ->
             // Send the POST request
