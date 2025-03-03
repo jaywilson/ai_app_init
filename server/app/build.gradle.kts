@@ -12,6 +12,7 @@ plugins {
 
     // Apply the application plugin to add support for building a CLI application in Java.
     application
+    kotlin("plugin.serialization") version "2.0.0"
 }
 
 repositories {
@@ -33,13 +34,15 @@ dependencies {
     implementation("io.ktor:ktor-client-core:2.3.5") // Core HTTP client library
     implementation("io.ktor:ktor-client-cio:2.3.5")  // CIO engine for the HTTP client
 
-    implementation("io.ktor:ktor-client-content-negotiation:2.3.5")
+    implementation("io.ktor:ktor-client-content-negotiation:2.3.5") // Routing for Ktor applications
     implementation("io.ktor:ktor-serialization-kotlinx-json:2.3.5")
 
     // Ktor Server Core and Netty Engine
     implementation("io.ktor:ktor-server-core:2.3.5")
     implementation("io.ktor:ktor-server-netty:2.3.5")
-
+    
+    
+    
     // JSON Content Negotiation for Ktor Server
     implementation("io.ktor:ktor-server-content-negotiation:2.3.5")
 

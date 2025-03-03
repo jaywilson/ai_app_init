@@ -19,6 +19,7 @@ class RequestHandler(BaseHTTPRequestHandler):
                 # Extract relevant fields (depending on the use case)
                 content = request_json.get("content", "")
 
+                print(f"Received content {content}")
                 # Dummy completion logic (replace with model inference)
                 completion = openai_util.completion(content)
 

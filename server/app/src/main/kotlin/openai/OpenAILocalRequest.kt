@@ -13,7 +13,9 @@ import server.CompletionRequest
 
 fun getCompletionResponse(content: String): String {
     // Run the HTTP POST request in a coroutine
+    print("Here")
     return runBlocking {
+        print("In run blocking")
         // Create an HTTP client
         val client = HttpClient(CIO) {
             install(ContentNegotiation) {
@@ -29,12 +31,15 @@ fun getCompletionResponse(content: String): String {
             content = content
         )
 
+        print("about to try for response")
+
         client.use { c ->
             // Send the POST request
             val response: HttpResponse = c.post(url) {
                 contentType(ContentType.Application.Json) // Set Content-Type to JSON
                 setBody(requestBody)                     // Set the request body as JSON
             }
+            print("got a response")
             response.bodyAsText()
         }
     }

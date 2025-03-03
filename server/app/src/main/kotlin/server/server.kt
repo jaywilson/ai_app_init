@@ -28,11 +28,21 @@ fun Application.module() {
     // Define the routing
     routing {
         post("/completion") {
-            val request = call.receive<CompletionRequest>() // Parse incoming JSON
-            val response = generateCompletion(request)
+            print("In completion")
+            
+            try {
+                val rawBody = call.receiveText()
+                print("Raw request body: $rawBody")
+                val request =
+                    kotlinx.serialization.json.Json.decodeFromString<CompletionRequest>(rawBody) // Parse incoming JSON
+                val response = generateCompletion(request)
 
-            // Send the response as JSON
-            call.respond(response)
+                // Send the response as JSON
+                call.respond(response)
+            } catch (e: Exception) {
+                print("Exception: $e")
+                call.respond(CompletionResponse(completion = "fail"))
+            }
         }
     }
 }
