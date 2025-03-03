@@ -8,7 +8,7 @@
 
 plugins {
     // Apply the org.jetbrains.kotlin.jvm Plugin to add support for Kotlin.
-    id("org.jetbrains.kotlin.jvm") version "1.5.0"
+    id("org.jetbrains.kotlin.jvm") version "2.1.10"
 
     // Apply the application plugin to add support for building a CLI application in Java.
     application
@@ -28,6 +28,20 @@ dependencies {
 
     // This dependency is used by the application.
     implementation("com.google.guava:guava:30.1.1-jre")
+
+    // Ktor Client Core and CIO Engine
+    implementation("io.ktor:ktor-client-core:2.3.5") // Core HTTP client library
+    implementation("io.ktor:ktor-client-cio:2.3.5")  // CIO engine for the HTTP client
+
+    implementation("io.ktor:ktor-client-content-negotiation:2.3.5")
+    implementation("io.ktor:ktor-serialization-kotlinx-json:2.3.5")
+
+    // Ktor Server Core and Netty Engine
+    implementation("io.ktor:ktor-server-core:2.3.5")
+    implementation("io.ktor:ktor-server-netty:2.3.5")
+
+    // JSON Content Negotiation for Ktor Server
+    implementation("io.ktor:ktor-server-content-negotiation:2.3.5")
 
     // Use the Kotlin test library.
     testImplementation("org.jetbrains.kotlin:kotlin-test")

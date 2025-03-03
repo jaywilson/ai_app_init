@@ -48,7 +48,7 @@ class RequestHandler(BaseHTTPRequestHandler):
         self.wfile.write(json.dumps(data).encode("utf-8"))
 
 # Configure and run the HTTP server
-def run_server(host="0.0.0.0", port=8080):
+def run_server(host="0.0.0.0", port=9002):
     server_address = (host, port)
     httpd = HTTPServer(server_address, RequestHandler)
     print(f"Server running on http://{host}:{port}")
