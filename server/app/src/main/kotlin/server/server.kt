@@ -10,7 +10,9 @@ import io.ktor.server.netty.*
 import kotlinx.serialization.Serializable
 import io.ktor.server.plugins.contentnegotiation.*
 import io.ktor.serialization.kotlinx.json.*
+import io.ktor.server.http.content.*
 import openai.getCompletionResponse
+import java.io.File
 
 class MainApp {
     companion object {
@@ -32,6 +34,11 @@ fun Application.module() {
 
     // Define the routing
     routing {
+        // Serve static files from the frontend/build directory
+        singlePageApplication {
+            react("/home/kiz/app/frontend/build")
+        }
+
         post("/completion") {
             print("In completion")
             
