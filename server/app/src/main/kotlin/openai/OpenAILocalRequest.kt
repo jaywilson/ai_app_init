@@ -13,7 +13,6 @@ import server.CompletionRequest
 
 fun getCompletionResponse(content: String): String {
     // Run the HTTP POST request in a coroutine
-    print("Here")
     return runBlocking {
         print("In run blocking")
         // Create an HTTP client

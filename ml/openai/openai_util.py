@@ -1,6 +1,8 @@
 from openai import OpenAI
 import parse_utils
+import azure_storage
 import json
+import uuid
 
 
 def completion(content: str) -> str:
@@ -13,7 +15,7 @@ def completion(content: str) -> str:
 
     Write the frontend in React. Write the backend server using Ktor.
 
-    Output all code files in one JSON structure. The structure should be a list of objects. Each object should have a filename attribute and a contents attribute.
+    Output all code files in one JSON structure. The structure should be a list of objects. Each object should have a "filename" attribute and a "contents" attribute.
     """
 
     print(f"Query: {query}")
@@ -27,6 +29,13 @@ def completion(content: str) -> str:
     print(f"Completion: {completion}")
     completion_text = completion.choices[0].message.content
 
-    for code in parse_utils.extract_all_json_blocks(completion_text):
-        print(f"Code: {json.dumps(code, indent=2)}")
+    blob_dir = uuid.uuid4()
+    for file_list in parse_utils.extract_all_json_blocks(completion_text):
+        for f in file_list:
+            filename = f['filename']
+            contents = f['contents']
+            blob = f"{blob_dir}/{filename}"
+            print(f"Uploading: {contents} {blob}")
+            azure_storage.upload_json_blob(contents, blob)
+
     return completion_text
