@@ -1,7 +1,6 @@
 package server
 
 import io.ktor.server.application.*
-import io.ktor.http.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
@@ -12,7 +11,6 @@ import io.ktor.server.plugins.contentnegotiation.*
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.http.content.*
 import openai.getCompletionResponse
-import java.io.File
 
 class MainApp {
     companion object {
@@ -32,7 +30,7 @@ fun Application.module() {
         json()
     }
 
-    // Define the routing
+        // Define the routing
     routing {
         // Serve static files from the frontend/build directory
         singlePageApplication {
@@ -40,14 +38,13 @@ fun Application.module() {
         }
 
         post("/completion") {
-            print("In completion")
-            
             try {
                 val rawBody = call.receiveText()
                 print("Raw request body: $rawBody")
                 val request =
                     kotlinx.serialization.json.Json.decodeFromString<CompletionRequest>(rawBody) // Parse incoming JSON
                 val response = generateCompletion(request)
+                println("Response $response")
 
                 // Send the response as JSON
                 call.respond(response)
