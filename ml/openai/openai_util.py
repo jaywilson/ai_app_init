@@ -13,11 +13,14 @@ def completion(content: str) -> str:
 
     {content}
 
-    Build the app frontend using React. Build the app backend using Kotlin and Ktor.
-    Create a database schema using Postgres.
+    Write the app frontend using React. The react frontend should be based on the exact directory
+    and file contents output by "npx create-react-app".
+
+    Write the app server using Kotlin and Ktor. The server should be based on the exact directory
+    and file contents output by "gradle init".
 
     The app frontend event handlers should post to the backend routes defined in Ktor.
-    The backend server routes to save data in the Postgres database.
+    The backend server routes should save data in a Postgres database with the required schema.
 
     Output all code files in one JSON structure. The structure should be a list of objects.
     Each object should have a "filename" attribute and a "contents" attribute.
