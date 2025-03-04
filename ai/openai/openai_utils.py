@@ -1,25 +1,35 @@
 from openai import OpenAI
 import parse_utils
 import azure_utils
+import context_utils
 import json
 import uuid
 
 
 def completion(content: str) -> str:
     client = OpenAI()
+    react_app = context_utils.get_react_app()
+    print(f"React app {react_app}")
 
     query = f"""
-    Use the following design document to create a Web application:
+    Use the following design document delimited by --- to build a Web application:
 
+    ---
     {content}
+    ---
 
-    Write the app frontend using React. The frontend should include
+    First identify the requirements for the application. Then build the complete implementation described below.
 
-    Write the app server using Kotlin and Ktor. The server should be based on the exact directory
-    and file contents output by "gradle init".
+    The web application should have three parts: the frontend, the backend, and the database.
 
-    The app frontend event handlers should post to the backend routes defined in Ktor.
-    The backend server routes should save data in a Postgres database with the required schema.
+    Frontend instructions: Write the app frontend using React. Your output should be a complete app
+    including all the files necessary to render the UI given the requirements.
+
+    Backend instructions: Write the app backend using Kotlin and Ktor. The backend should start an HTTP server and define
+    routes that handle the events defined in the Frontend given the requirements.
+
+    Database instructions: Write SQL files to create the database schema. The tables should match the
+    objects described in the requirements.
 
     Output all code files in one JSON structure. The structure should be a list of objects.
     Each object should have a "filename" attribute and a "contents" attribute.
@@ -27,7 +37,7 @@ def completion(content: str) -> str:
 
     print(f"Query: {query}")
     completion = client.chat.completions.create(
-        model="gpt-4o",
+        model="o1-preview-2024-09-12",
         store=True,
         messages=[
             {"role": "user", "content": query}
