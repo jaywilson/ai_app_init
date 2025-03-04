@@ -1,4 +1,4 @@
 __pycache__
-ml/.env/
-ml/openai/.env/
+ai/.env/
+ai/openai/.env/
 /download/

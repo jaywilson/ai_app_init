@@ -1,6 +1,6 @@
 from openai import OpenAI
 import parse_utils
-import azure_storage
+import azure_utils
 import json
 import uuid
 
@@ -13,8 +13,7 @@ def completion(content: str) -> str:
 
     {content}
 
-    Write the app frontend using React. The react frontend should be based on the exact directory
-    and file contents output by "npx create-react-app".
+    Write the app frontend using React. The frontend should include
 
     Write the app server using Kotlin and Ktor. The server should be based on the exact directory
     and file contents output by "gradle init".
@@ -40,10 +39,13 @@ def completion(content: str) -> str:
     blob_dir = uuid.uuid4()
     for file_list in parse_utils.extract_all_json_blocks(completion_text):
         for f in file_list:
-            filename = f['filename']
-            contents = f['contents']
-            blob = f"{blob_dir}/{filename}"
-            print(f"Uploading: {contents} {blob}")
-            azure_storage.upload_json_blob(contents, blob)
+            try:
+                filename = f['filename']
+                contents = f['contents']
+                blob = f"{blob_dir}/{filename}"
+                print(f"Uploading: {contents} {blob}")
+                azure_utils.upload_json_blob(contents, blob)
+            except Exception as e:
+                print(f"Error: {str(e)} File: {f}")
 
     return completion_text

@@ -4,12 +4,12 @@
     <exclude-output />
     <content url="file://$MODULE_DIR$">
       <sourceFolder url="file://$MODULE_DIR$/frontend/src" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/ml/openai" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/server/app/src/main" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/server/app/src/test" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/ai/openai" isTestSource="false" />
+      <excludeFolder url="file://$MODULE_DIR$/ai/.env" />
+      <excludeFolder url="file://$MODULE_DIR$/ai/openai/.env" />
       <excludeFolder url="file://$MODULE_DIR$/download" />
-      <excludeFolder url="file://$MODULE_DIR$/ml/.env" />
-      <excludeFolder url="file://$MODULE_DIR$/ml/openai/.env" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />

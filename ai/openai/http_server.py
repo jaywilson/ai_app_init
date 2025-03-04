@@ -1,6 +1,6 @@
 from http.server import BaseHTTPRequestHandler, HTTPServer
 import json
-import openai_util
+import openai_utils
 
 # Custom HTTP request handler
 class RequestHandler(BaseHTTPRequestHandler):
@@ -21,7 +21,7 @@ class RequestHandler(BaseHTTPRequestHandler):
 
                 print(f"Received content {content}")
                 # Dummy completion logic (replace with model inference)
-                completion = openai_util.completion(content)
+                completion = openai_utils.completion(content)
 
                 # Respond to the client with the generated text
                 response = {
