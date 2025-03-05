@@ -1,0 +1,23 @@
+f"""
+Use the following design document delimited by --- to build a Web application:
+
+---
+{{ user_requirements }}
+---
+
+First identify the requirements for the application. Then build the complete implementation described below.
+
+The web application should have three parts: the frontend, the backend, and the database.
+
+Frontend instructions: Write the app frontend using React. Your output should be a complete app
+including all the files necessary to render the UI given the requirements.
+
+Backend instructions: Write the app backend using Kotlin and Ktor. The backend should start an HTTP server and define
+routes that handle the events defined in the Frontend given the requirements.
+
+Database instructions: Write SQL files to create the database schema. The tables should match the
+objects described in the requirements.
+
+Output all code files in one JSON structure. The structure should be a list of objects.
+Each object should have a "filename" attribute and a "contents" attribute.
+"""
