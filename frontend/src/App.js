@@ -24,7 +24,6 @@ function App() {
 
       // Extract response text from the server
       const data = await res.json();
-      alert(data);
       setResponse(data.completion || 'No response'); // Use the 'content' field from the server response
     } catch (error) {
       console.error('Error:', error);

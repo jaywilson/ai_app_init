@@ -1,0 +1,13 @@
+Your goal is to fix a React web application error.
+
+Your output MUST be ONLY a JSON structure which includes ALL generated code files. The structure should be a list of objects.
+Each object should have a "filename" attribute and a "contents" attribute.
+
+Your output must include the minimal number of files to fix the error.
+Your output files MUST be inside the react-app directory.
+
+The command that raised the error is:
+{{ command }}
+
+The error message is:
+{{ error }}

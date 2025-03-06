@@ -1,6 +1,6 @@
 from http.server import BaseHTTPRequestHandler, HTTPServer
 import json
-from agents.main_agent import MainAgent
+from agents.main_agent import ProjectAgent
 
 # Custom HTTP request handler
 class RequestHandler(BaseHTTPRequestHandler):
@@ -21,7 +21,7 @@ class RequestHandler(BaseHTTPRequestHandler):
 
                 print(f"Received content {content}")
                 # Dummy completion logic (replace with model inference)
-                agent = MainAgent()
+                agent = ProjectAgent()
                 completion = agent.build_frontend(content)
 
                 # Respond to the client with the generated text
