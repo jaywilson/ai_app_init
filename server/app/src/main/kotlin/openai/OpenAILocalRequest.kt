@@ -8,39 +8,32 @@ import io.ktor.http.*
 import io.ktor.client.plugins.contentnegotiation.*
 import kotlinx.coroutines.runBlocking
 import io.ktor.serialization.kotlinx.json.*
-import server.CompletionRequest
+import kotlinx.serialization.json.Json
+import server.ProjectRequest
+import server.ProjectResponse
 
 
-fun getCompletionResponse(content: String): String {
-    // Run the HTTP POST request in a coroutine
+fun getProjectResponse(content: String): ProjectResponse {
     return runBlocking {
-        print("In run blocking")
-        // Create an HTTP client
         val client = HttpClient(CIO) {
             install(ContentNegotiation) {
-                json() // Add JSON serialization support
+                json()
             }
             engine {
-                requestTimeout = 300000 // Set request timeout to 300 seconds
+                requestTimeout = 300000 // 300 sec
             }
         }
 
-        // Define the endpoint URL
-        val url = "http://localhost:9002/completion"
-
-        // Define the request body
-        val requestBody = CompletionRequest(
+        val url = "http://localhost:9002/frontend_project"
+        val requestBody = ProjectRequest(
             content = content
         )
-
         client.use { c ->
-            // Send the POST request
             val response: HttpResponse = c.post(url) {
-                contentType(ContentType.Application.Json) // Set Content-Type to JSON
-                setBody(requestBody)                     // Set the request body as JSON
+                contentType(ContentType.Application.Json)
+                setBody(requestBody)                   
             }
-            print("got a response")
-            response.bodyAsText()
+            Json.decodeFromString<ProjectResponse>(response.bodyAsText())
         }
     }
 }

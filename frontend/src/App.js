@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 
+
 function App() {
   // State for user input and server response
   const [userInput, setUserInput] = useState('');
@@ -9,7 +10,7 @@ function App() {
   const handleSubmit = async () => {
     try {
       // Send the request to the Ktor server
-      const res = await fetch('http://localhost:8080/completion', {
+      const res = await fetch('http://localhost:8080/frontend_project', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -24,7 +25,8 @@ function App() {
 
       // Extract response text from the server
       const data = await res.json();
-      setResponse(data.completion || 'No response'); // Use the 'content' field from the server response
+      console.log('Response:', data);
+      setResponse(data.projectId || data.error); // Use the 'content' field from the server response
     } catch (error) {
       console.error('Error:', error);
       setResponse('An error occurred while contacting the server.');

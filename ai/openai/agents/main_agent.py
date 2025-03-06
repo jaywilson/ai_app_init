@@ -6,7 +6,9 @@ from time import sleep
 import openai_utils
 import utils
 import os
+import shutil
 import subprocess
+import azure_utils
 
 
 @dataclass
@@ -14,16 +16,25 @@ class Command:
     command: list[str]
     wait_for_complete: bool = True
     wait_timout: int = 300
+    kill: bool = False
+
+@dataclass
+class Project:
+    project_id: str | None
+    error: str | None
 
 
 class ProjectAgent:
     OUTPUT_DIR = f"{utils.APP_ROOT_DIR}/generated_projects"
 
     def __init__(self, openai: openai_utils.OpenAIUtils | None = None):
-        self.openai = openai_utils.OpenAIUtils() if openai is None else openai
         self.project_id = uuid.uuid4().hex
+        self.project_path = os.path.join(ProjectAgent.OUTPUT_DIR, self.project_id)
+        self.react_app_path = os.path.join(self.project_path, 'react-app')
+        self.openai = openai_utils.OpenAIUtils() if openai is None else openai
+        self.azure = azure_utils.Azure()
 
-    def build_frontend(self, user_requirements: str) -> str:
+    def build_frontend(self, user_requirements: str) -> Project:
         template_files = utils.get_template_contents(
             f"{utils.APP_ROOT_DIR}/ai/openai/templates/react/react-app",
             "react-app",
@@ -39,13 +50,15 @@ class ProjectAgent:
             }
         )
         self.write_project(completion_text, template_file_paths, template_files)
-        self.run_and_try_fix_commands(
+        error = self.run_and_try_fix_commands(
             [
                 Command(command=['npm', 'install']),
-                Command(command=['npm', 'start'], wait_for_complete=False, wait_timout=10),
+                Command(command=['npm', 'start'], wait_for_complete=False, wait_timout=10, kill=True),
             ]
         )
-        return completion_text
+        self.upload()
+        self.delete()
+        return Project(self.project_id, error)
 
 
     def write_project(self, completion_text: str, template_file_paths: list[str], template_files: dict[str, str]):
@@ -57,7 +70,6 @@ class ProjectAgent:
             print(f"Completion did not modify {template_file_path}. Using template version.")
             contents = template_files[template_file_path]
             self.write_project_file(template_file_path, contents)
-            # azure_utils.upload_json_blob(contents, blob)
 
     def write_completion_files(self, completion_text: str) -> list[str]:
         completion_file_list = json.loads(completion_text)
@@ -73,28 +85,27 @@ class ProjectAgent:
         return completion_files
 
     def write_project_file(self, file_path: str, contents: str):
-        project_path = f"{self.project_id}/{file_path}"
-        output_path = os.path.join(ProjectAgent.OUTPUT_DIR, project_path)
+        output_path = os.path.join(self.project_path, file_path)
         os.makedirs(os.path.dirname(output_path), exist_ok=True)
         with open(output_path, 'w') as f:
             print(f"Writing: {output_path}")
             f.write(contents)
 
-    def run_and_try_fix_commands(self, commands: list[Command]):
+    def run_and_try_fix_commands(self, commands: list[Command]) -> str | None:
         max_tries = 3
         cur_try = 0
-        success = False
-        while not success and cur_try < max_tries:
+        error = ""
+        while error is not None and cur_try < max_tries:
             cur_try += 1
             for command in commands:
-                success = self.run_command(command)
+                error = self.run_command(command)
+        return error
 
-    def run_command(self, command: Command) -> bool:
+    def run_command(self, command: Command) -> str | None:
         print(f"running {command}")
-        project_path = os.path.join(ProjectAgent.OUTPUT_DIR, self.project_id, 'react-app')
         process = subprocess.Popen(
             command.command,
-            cwd=project_path,
+            cwd=self.react_app_path,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             stdin=subprocess.DEVNULL
@@ -111,10 +122,13 @@ class ProjectAgent:
             output = f"stdout: {stdout.decode()[0:500]} stderr: {stderr.decode()[0:500]}"
             print(f"stdout: {output}")
             self.fix_command_error(command.command, output)
-            return False
+            return output
         else:
             print(f"{command} success")
-            return True
+            if command.kill:
+                process.kill()
+                print(f"{command} killed successfully")
+            return None
 
     def fix_command_error(self, command: list[str], error: str):
         error_completion = self.openai.get_template_completion("frontend_error.prompt", {
@@ -123,3 +137,11 @@ class ProjectAgent:
         })
         print(f"Error completion: {error_completion}")
         self.write_completion_files(error_completion)
+
+    def upload(self):
+        # todo azure TTL
+        self.azure.upload_dir(self.project_path)
+
+    def delete(self):
+        shutil.rmtree(self.project_path)
+        print(f"Deleted project {self.project_path}")

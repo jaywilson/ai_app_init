@@ -10,7 +10,7 @@ import kotlinx.serialization.Serializable
 import io.ktor.server.plugins.contentnegotiation.*
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.http.content.*
-import openai.getCompletionResponse
+import openai.getProjectResponse
 
 class MainApp {
     companion object {
@@ -37,41 +37,28 @@ fun Application.module() {
             react("/home/kiz/app/frontend/build")
         }
 
-        post("/completion") {
+        post("/frontend_project") {
             try {
-                val rawBody = call.receiveText()
-                print("Raw request body: $rawBody")
-                val request =
-                    kotlinx.serialization.json.Json.decodeFromString<CompletionRequest>(rawBody) // Parse incoming JSON
-                val response = generateCompletion(request)
-                println("Response $response")
-
-                // Send the response as JSON
+                val request = call.receive<ProjectRequest>()
+                val response = getProjectResponse(request.content)
                 call.respond(response)
             } catch (e: Exception) {
                 print("Exception: $e")
-                call.respond(CompletionResponse(completion = "fail"))
+                call.respond(ProjectResponse(error = e.message))
             }
         }
     }
 }
 
-// Function to generate a dummy response for completion
-fun generateCompletion(request: CompletionRequest): CompletionResponse {
-    val completion = getCompletionResponse(request.content)
-    return CompletionResponse(
-        completion = completion
-    )
-}
-
 // DTOs for request and response
 
 @Serializable
-data class CompletionRequest(
+data class ProjectRequest(
     val content: String
 )
 
 @Serializable
-data class CompletionResponse(
-    val completion: String
+data class ProjectResponse(
+    val projectId: String? = null,
+    val error: String? = null
 )
