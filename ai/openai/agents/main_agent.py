@@ -17,7 +17,7 @@ class Command:
 
 
 class ProjectAgent:
-    OUTPUT_DIR = "/home/kiz/generated_projects"
+    OUTPUT_DIR = f"{utils.APP_ROOT_DIR}/generated_projects"
 
     def __init__(self, openai: openai_utils.OpenAIUtils | None = None):
         self.openai = openai_utils.OpenAIUtils() if openai is None else openai
@@ -25,7 +25,7 @@ class ProjectAgent:
 
     def build_frontend(self, user_requirements: str) -> str:
         template_files = utils.get_template_contents(
-            "/home/kiz/app/ai/openai/templates/react/react-app",
+            f"{utils.APP_ROOT_DIR}/ai/openai/templates/react/react-app",
             "react-app",
         )
         template_file_paths = list(template_files.keys())

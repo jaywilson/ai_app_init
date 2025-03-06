@@ -2,11 +2,12 @@ from typing import Dict
 
 from openai import OpenAI
 import jinja2
+import utils
 
 
 class OpenAIUtils:
     def __init__(self):
-        self.jinja = jinja2.Environment(loader=jinja2.FileSystemLoader('/home/kiz/app/ai/openai/prompts'))
+        self.jinja = jinja2.Environment(loader=jinja2.FileSystemLoader(f"{utils.APP_ROOT_DIR}/ai/openai/prompts"))
         self.client = OpenAI()
 
     def get_template_completion(self, template: str, template_params: Dict[str, str]) -> str:

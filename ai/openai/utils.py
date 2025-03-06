@@ -4,6 +4,8 @@ import os
 from typing import Dict
 
 
+APP_ROOT_DIR = os.environ['APP_ROOT_DIR']
+
 def extract_all_json_blocks(text):
     # Find all JSON code blocks in the text
     matches = re.findall(r"```json\s*([\s\S]*?)```", text)
