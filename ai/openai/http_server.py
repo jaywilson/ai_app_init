@@ -1,6 +1,6 @@
 from http.server import BaseHTTPRequestHandler, HTTPServer
 import json
-import openai_utils
+from agents.main_agent import MainAgent
 
 # Custom HTTP request handler
 class RequestHandler(BaseHTTPRequestHandler):
@@ -21,7 +21,8 @@ class RequestHandler(BaseHTTPRequestHandler):
 
                 print(f"Received content {content}")
                 # Dummy completion logic (replace with model inference)
-                completion = openai_utils.completion(content)
+                agent = MainAgent()
+                completion = agent.build_frontend(content)
 
                 # Respond to the client with the generated text
                 response = {
