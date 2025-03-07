@@ -1,8 +1,6 @@
 from http.server import BaseHTTPRequestHandler, HTTPServer
 import json
-from urllib.parse import urlparse, parse_qs
 from agents.main_agent import ProjectAgent
-from azure_utils import Azure
 
 class RequestHandler(BaseHTTPRequestHandler):
     def do_POST(self):
