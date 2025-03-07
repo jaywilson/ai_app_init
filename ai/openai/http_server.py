@@ -25,27 +25,6 @@ class RequestHandler(BaseHTTPRequestHandler):
         else:
             self._send_json_response({"error": "Endpoint not found"}, 404)
 
-    def do_GET(self):
-        if self.path.startswith('/download_project'):
-            parsed_url = urlparse(self.path)
-            params = parse_qs(parsed_url.query)
-            project_id = params.get('project_id', [None])[0]
-            
-            if project_id is None:
-                self._send_json_response({"error": "Missing project_id parameter"}, 400)
-                return
-                
-            azure = Azure()
-            project_zip_contents = azure.get_project_zip_contents(project_id)
-           
-            self.send_response(200)
-            self.send_header('Content-Type', 'application/zip')
-            self.send_header('Content-Disposition', f'attachment; filename="{project_id}.zip"')
-            self.end_headers()
-            self.wfile.write(project_zip_contents)
-        else:
-            self._send_json_response({"error": "Endpoint not found"}, 404)
-
     def _send_json_response(self, data, status_code):
         self.send_response(status_code)
         self.send_header("Content-Type", "application/json")
