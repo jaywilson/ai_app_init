@@ -44,6 +44,10 @@ dependencies {
     // JSON Content Negotiation for Ktor Server
     implementation("io.ktor:ktor-server-content-negotiation:2.3.5")
 
+    // Azure Storage Blob dependencies
+    implementation("com.azure:azure-storage-blob:12.24.1")
+    implementation("com.azure:azure-identity:1.11.1")
+
     // Use the Kotlin test library.
     testImplementation("org.jetbrains.kotlin:kotlin-test")
 

@@ -30,11 +30,19 @@ class ProjectAgent:
 
     def __init__(self, openai: openai_utils.OpenAIUtils | None = None):
         self.project_id = uuid.uuid4().hex
-        self.project_path = os.path.join(ProjectAgent.OUTPUT_DIR, self.project_id)
-        self.project_zip_path = os.path.join(self.project_path, "project.zip")
+        self.project_path = ProjectAgent.get_project_path(self.project_id)
+        self.project_zip_path = ProjectAgent.get_project_zip_path(self.project_id)
         self.react_app_path = os.path.join(self.project_path, 'react-app')
         self.openai = openai_utils.OpenAIUtils() if openai is None else openai
         self.azure = azure_utils.Azure()
+
+    @staticmethod
+    def get_project_path(project_id: str):
+        return os.path.join(ProjectAgent.OUTPUT_DIR, project_id)
+
+    @staticmethod
+    def get_project_zip_path(project_id: str):
+        return os.path.join(ProjectAgent.get_project_path(project_id), "project.zip")
 
     def build_frontend(self, user_requirements: str) -> Project:
         template_files = utils.get_template_contents(

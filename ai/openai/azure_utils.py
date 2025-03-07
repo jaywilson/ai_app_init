@@ -46,6 +46,13 @@ class Azure:
                 break
         print(f"Azure: Uploaded {count} files from {source}")
 
+    def get_blob_contents(self, blob: str):
+        blob_client = self.blob_service_client.get_blob_client(container="app", blob=blob)
+        return blob_client.download_blob().readall()
+
+    def get_project_zip_contents(self, project_id: str):
+        return self.get_blob_contents(f"{project_id}/project.zip")
+
     @staticmethod
     def is_file_filtered(file_path: str):
         return "node_modules" in file_path

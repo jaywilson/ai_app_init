@@ -3,3 +3,4 @@ ai/.env/
 ai/openai/.env/
 /download/
 generated_projects
+server/.kotlin

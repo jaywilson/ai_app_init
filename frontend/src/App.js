@@ -67,20 +67,46 @@ function App() {
             Submit
           </button>
         </div>
-
-        {/* Display server response */}
-        <div>
-          <label htmlFor="serverResponse">Response from server:</label>
-          <br />
-          <textarea
-              id="serverResponse"
-              rows="4"
-              style={{ width: '100%' }}
-              value={response}
-              readOnly
-              placeholder="Server response will appear here..."
-          />
-        </div>
+        {/* Download button */}
+        {response && response !== 'Building Project...' && !response.startsWith('An error') && (
+          <div style={{ marginBottom: '10px' }}>
+            <button
+              onClick={async () => {
+                try {
+                  const res = await fetch(`http://localhost:8080/download_project?project_id=${response}`);
+                  if (!res.ok) {
+                    throw new Error(`Download failed with status: ${res.status}`);
+                  }
+                  
+                  // Create blob from response and trigger download
+                  const blob = await res.blob();
+                  const url = window.URL.createObjectURL(blob);
+                  const a = document.createElement('a');
+                  a.href = url;
+                  a.download = `${response}.zip`;
+                  document.body.appendChild(a);
+                  a.click();
+                  window.URL.revokeObjectURL(url);
+                  document.body.removeChild(a);
+                } catch (error) {
+                  console.error('Download error:', error);
+                  setResponse('Error downloading project');
+                }
+              }}
+              style={{
+                padding: '10px 20px',
+                backgroundColor: '#28a745',
+                color: '#fff', 
+                border: 'none',
+                borderRadius: '5px',
+                cursor: 'pointer',
+                marginLeft: '10px'
+              }}
+            >
+              Download Project
+            </button>
+          </div>
+        )}
       </div>
   );
 }
