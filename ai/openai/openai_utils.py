@@ -11,9 +11,6 @@ class OpenAIUtils:
         self.client = OpenAI()
 
     def get_template_completion(self, template: str, template_params: Dict[str, str]) -> str:
-        if template == "frontend.prompt":
-            return self.saved_prompt()
-
         template = self.jinja.get_template(template)
         query = template.render(template_params)
         print(f"get_template_completion: {query}")
