@@ -172,6 +172,7 @@ class ProjectAgent:
             contents = f.read()
             upload_path = f"{self.project_id}/project.zip"
             self.azure.upload_blob(contents, upload_path)
+            print(f"Uploaded project zip {self.project_zip_path}")
 
     def delete(self):
         shutil.rmtree(self.project_path)
