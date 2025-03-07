@@ -9,6 +9,7 @@ import os
 import shutil
 import subprocess
 import azure_utils
+import zipfile
 
 
 @dataclass
@@ -30,6 +31,7 @@ class ProjectAgent:
     def __init__(self, openai: openai_utils.OpenAIUtils | None = None):
         self.project_id = uuid.uuid4().hex
         self.project_path = os.path.join(ProjectAgent.OUTPUT_DIR, self.project_id)
+        self.project_zip_path = os.path.join(self.project_path, "project.zip")
         self.react_app_path = os.path.join(self.project_path, 'react-app')
         self.openai = openai_utils.OpenAIUtils() if openai is None else openai
         self.azure = azure_utils.Azure()
@@ -62,6 +64,7 @@ class ProjectAgent:
 
 
     def write_project(self, completion_text: str, template_file_paths: list[str], template_files: dict[str, str]):
+        # Create project directory structure
         completion_files = self.write_completion_files(completion_text)
         for template_file_path in template_file_paths:
             if template_file_path in completion_files:
@@ -140,7 +143,35 @@ class ProjectAgent:
 
     def upload(self):
         # todo azure TTL
-        self.azure.upload_dir(self.project_path)
+        count = 0
+        max_count = 100
+        is_max_count = False
+        with zipfile.ZipFile(self.project_zip_path, 'w', zipfile.ZIP_DEFLATED) as zipf:
+            for root, dirs, files in os.walk(self.project_path):
+                if count > max_count:
+                    is_max_count = True
+                    break
+
+                for file in files:
+                    file_path = os.path.join(root, file)
+                    if "node_modules" in file_path:
+                        continue
+
+                    arcname = os.path.relpath(file_path, self.project_path)
+                    zipf.write(file_path, arcname)
+                    count += 1
+                    if count > max_count:
+                        break
+
+        if is_max_count:
+            print(f"Warning: Uploading max count files ({max_count}).")
+        else:
+            print(f"Uploading {count} files.")
+
+        with open(self.project_zip_path, 'rb') as f:
+            contents = f.read()
+            upload_path = f"{self.project_id}/project.zip"
+            self.azure.upload_blob(contents, upload_path)
 
     def delete(self):
         shutil.rmtree(self.project_path)

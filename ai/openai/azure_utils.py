@@ -10,7 +10,7 @@ class Azure:
             credential=self.token_credential)
         self.container_client = self.blob_service_client.get_container_client("app")
 
-    def upload_json_blob(self, contents: str, blob: str):
+    def upload_blob(self, contents: str, blob: str):
         blob_client = self.blob_service_client.get_blob_client(container="app", blob=blob)
         blob_client.upload_blob(contents)
 
