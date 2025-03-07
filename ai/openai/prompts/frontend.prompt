@@ -1,4 +1,4 @@
-Your goal is to build a web application frontend based on a user requirements document.
+Your goal is to build a web application frontend based on a list of requirements.
 
 Your output MUST be ONLY a JSON structure which includes ALL generated code files. The structure should be a list of objects.
 Each object should have a "filename" attribute and a "contents" attribute.
@@ -10,13 +10,9 @@ is contained in the list below:
 {{ template_files }}
 ---
 
+You should break down functionality into separate React components as much as possible.
 You MUST ensure all necessary dependencies to run the app are included in react-app/package.json
 You MUST use or extend the existing directory structure and modify existing files if needed.
-You should break down functionality into separate React components as much as possible.
-You should create mock data in all event handlers so that the application is fully functional.
 
-The full user requirements document is below:
-
----
-{{ user_requirements }}
----
+The list of requirements is below:
+{{ requirements }}

@@ -1,0 +1,6 @@
+Your goal to extract functional requirements from the design document below.
+
+Your output should be a JSON list of one-sentence requirements.
+
+Here is the design document:
+{{ user_requirements }}

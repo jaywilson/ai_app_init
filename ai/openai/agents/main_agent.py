@@ -28,13 +28,13 @@ class Project:
 class ProjectAgent:
     OUTPUT_DIR = f"{utils.APP_ROOT_DIR}/generated_projects"
 
-    def __init__(self, openai: openai_utils.OpenAIUtils | None = None):
+    def __init__(self, conversation: openai_utils.Conversation | None = None):
         self.project_id = uuid.uuid4().hex
         self.project_path = ProjectAgent.get_project_path(self.project_id)
         self.project_zip_path = ProjectAgent.get_project_zip_path(self.project_id)
         self.react_app_path = os.path.join(self.project_path, 'react-app')
-        self.openai = openai_utils.OpenAIUtils() if openai is None else openai
         self.azure = azure_utils.Azure()
+        self.conversation = conversation if conversation is not None else openai_utils.Conversation()
 
     @staticmethod
     def get_project_path(project_id: str):
@@ -52,14 +52,22 @@ class ProjectAgent:
         template_file_paths = list(template_files.keys())
         print(f"Template files {template_file_paths}")
 
-        completion_text = self.openai.get_template_completion(
-            "frontend.prompt",
+        requirements_completion = self.conversation.get_template_completion(
+            "requirements.prompt",
             {
                 "user_requirements": user_requirements,
+            }
+        )
+
+        code_completion = self.conversation.get_template_completion(
+            "frontend.prompt",
+            {
+                "requirements": requirements_completion,
                 "template_files": template_file_paths,
             }
         )
-        self.write_project(completion_text, template_file_paths, template_files)
+
+        self.write_project(code_completion, template_file_paths, template_files)
         error = self.run_and_try_fix_commands(
             [
                 Command(command=['npm', 'install']),
