@@ -1,0 +1,14 @@
+Your goal is to build a server backend for a web application based on a server API and functional requirements.
+
+Your output MUST be ONLY a JSON structure which includes ALL generated code files. The structure should be a list of objects.
+Each object should have a "filename" attribute and a "contents" attribute. All filenames MUST be under the "server" root directory.
+
+The backend should be written in Kotlin using Ktor.
+Dependencies should be managed with Gradle. Gradle MUST use the "application" plugin. The org.jetbrains.kotlin.jvm plugin MUST use version 2.1.10.
+Data should be saved in a Postgres database.
+
+Make sure to implement each API endpoint in the provided list.
+The server MUST start successfully when run with "gradle run".
+
+Here is the server API:
+{{ server_api }}

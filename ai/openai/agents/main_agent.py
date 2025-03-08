@@ -33,6 +33,7 @@ class ProjectAgent:
         self.project_path = ProjectAgent.get_project_path(self.project_id)
         self.project_zip_path = ProjectAgent.get_project_zip_path(self.project_id)
         self.react_app_path = os.path.join(self.project_path, 'react-app')
+        self.server_path = os.path.join(self.project_path, 'server')
         self.azure = azure_utils.Azure()
         self.conversation = conversation if conversation is not None else openai_utils.Conversation()
 
@@ -52,30 +53,51 @@ class ProjectAgent:
         template_file_paths = list(template_files.keys())
         print(f"Template files {template_file_paths}")
 
-        requirements_completion = self.conversation.get_template_completion(
+        requirements_completion = json.loads(self.conversation.get_template_completion(
             "requirements.prompt",
             {
                 "user_requirements": user_requirements,
             }
-        )
+        ))
+        requirements = requirements_completion['requirements']
+        server_api = requirements_completion['server_api']
 
-        code_completion = self.conversation.get_template_completion(
+        frontend_completion = self.conversation.get_template_completion(
             "frontend.prompt",
             {
-                "requirements": requirements_completion,
+                "requirements": requirements,
+                "server_api": server_api,
                 "template_files": template_file_paths,
             }
         )
 
-        self.write_project(code_completion, template_file_paths, template_files)
+        self.write_project(frontend_completion, template_file_paths, template_files)
         error = self.run_and_try_fix_commands(
+            self.react_app_path,
             [
                 Command(command=['npm', 'install']),
                 Command(command=['npm', 'start'], wait_for_complete=False, wait_timout=10, kill=True),
             ]
         )
+
+        backend_completion = self.conversation.get_template_completion(
+            "backend.prompt",
+            {
+                "server_api": server_api,
+            }
+        )
+        print(f"Backend completion: {backend_completion}")
+        self.write_project(backend_completion, [], {})
+        error = self.run_and_try_fix_commands(
+            self.server_path,
+            [
+                Command(command=['gradle', 'build']),
+            ]
+        )
+
         self.upload()
-        self.delete()
+        # self.delete()
+        # testing so don't delete
         return Project(self.project_id, error)
 
 
@@ -110,21 +132,21 @@ class ProjectAgent:
             print(f"Writing: {output_path}")
             f.write(contents)
 
-    def run_and_try_fix_commands(self, commands: list[Command]) -> str | None:
+    def run_and_try_fix_commands(self, working_dir: str, commands: list[Command]) -> str | None:
         max_tries = 3
         cur_try = 0
         error = ""
         while error is not None and cur_try < max_tries:
             cur_try += 1
             for command in commands:
-                error = self.run_command(command)
+                error = self.run_command(working_dir, command)
         return error
 
-    def run_command(self, command: Command) -> str | None:
+    def run_command(self, working_dir: str, command: Command) -> str | None:
         print(f"running {command}")
         process = subprocess.Popen(
             command.command,
-            cwd=self.react_app_path,
+            cwd=working_dir,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             stdin=subprocess.DEVNULL
@@ -140,7 +162,7 @@ class ProjectAgent:
             print(f"{command} failed with return code {process.returncode}")
             output = f"stdout: {stdout.decode()[0:500]} stderr: {stderr.decode()[0:500]}"
             print(f"stdout: {output}")
-            self.fix_command_error(command.command, output)
+            self.fix_command_error(working_dir, command.command, output)
             return output
         else:
             print(f"{command} success")
@@ -149,8 +171,9 @@ class ProjectAgent:
                 print(f"{command} killed successfully")
             return None
 
-    def fix_command_error(self, command: list[str], error: str):
-        error_completion = self.openai.get_template_completion("frontend_error.prompt", {
+    def fix_command_error(self, working_dir: str, command: list[str], error: str):
+        error_completion = self.conversation.get_template_completion("fix_error.prompt", {
+            "working_dir": working_dir,
             "command": " ".join(command),
             "error": error,
         })

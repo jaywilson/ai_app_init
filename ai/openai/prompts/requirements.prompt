@@ -1,6 +1,11 @@
-Your goal to extract functional requirements from the design document below.
+Your goal to extract functional requirements and backend API from the design document below.
 
-Your output should be a JSON list of one-sentence requirements.
+Your output should be a JSON object. It should have two fields: "requirements" and "server_api".
+
+"requirements" should be a list of one-sentence functional requirements.
+"server_api" should be a list of HTTP paths to update state on the server
+
+The server api MUST include both read and write endpoints for all requirements.
 
 Here is the design document:
 {{ user_requirements }}

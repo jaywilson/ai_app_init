@@ -1,4 +1,4 @@
-Your goal is to build a web application frontend based on a list of requirements.
+Your goal is to build a web application frontend based on a list of requirements and a server API.
 
 Your output MUST be ONLY a JSON structure which includes ALL generated code files. The structure should be a list of objects.
 Each object should have a "filename" attribute and a "contents" attribute.
@@ -10,9 +10,11 @@ is contained in the list below:
 {{ template_files }}
 ---
 
-You should break down functionality into separate React components as much as possible.
-You MUST ensure all necessary dependencies to run the app are included in react-app/package.json
-You MUST use or extend the existing directory structure and modify existing files if needed.
+For each requirement, there should usually be a separate React component.
+For each requirement, the frontend should update the backend server state by making an HTTP request.
 
-The list of requirements is below:
+Here is the list of requirements:
 {{ requirements }}
+
+Here is the server API:
+{{ server_api }}
