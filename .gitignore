@@ -1,6 +1,4 @@
 __pycache__
-ai/.env/
-ai/openai/.env/
-/download/
+ai/server/.env/
 generated_projects
 server/.kotlin
