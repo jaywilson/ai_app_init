@@ -1,6 +1,7 @@
 import json
 import uuid
 from dataclasses import dataclass
+from enum import Enum
 from time import sleep
 
 import openai_utils
@@ -24,9 +25,22 @@ class Project:
     project_id: str | None
     error: str | None
 
+@dataclass
+class Backend:
+    framework: str
+    dependencies: str
+
+class BackendName(Enum):
+    JAVA = 1
+    KOTLIN = 2
+
 
 class ProjectAgent:
     OUTPUT_DIR = f"{utils.APP_ROOT_DIR}/generated_projects"
+    BACKENDS = {
+        BackendName.JAVA: Backend(framework="Java and the Javalin http server library", dependencies="Maven. The server MUST run using mvn clean compile exec:java"),
+        BackendName.KOTLIN: Backend(framework="Kotlin and the Ktor http server library", dependencies="Gradle. Gradle MUST use the application plugin. The org.jetbrains.kotlin.jvm plugin MUST use version 2.1.10."),
+    }
 
     def __init__(self, conversation: openai_utils.Conversation | None = None):
         self.project_id = uuid.uuid4().hex
@@ -45,7 +59,7 @@ class ProjectAgent:
     def get_project_zip_path(project_id: str):
         return os.path.join(ProjectAgent.get_project_path(project_id), "project.zip")
 
-    def build_frontend(self, user_requirements: str) -> Project:
+    def build_project(self, user_requirements: str, backend_name: BackendName) -> Project:
         template_files = utils.get_template_contents(
             f"{utils.APP_ROOT_DIR}/ai/openai/templates/react/react-app",
             "react-app",
@@ -84,6 +98,8 @@ class ProjectAgent:
             "backend.prompt",
             {
                 "server_api": server_api,
+                "backend_framework": self.BACKENDS[backend_name].framework,
+                "dependency_framework": self.BACKENDS[backend_name].dependencies,
             }
         )
         print(f"Backend completion: {backend_completion}")
@@ -173,7 +189,7 @@ class ProjectAgent:
 
     def fix_command_error(self, working_dir: str, command: list[str], error: str):
         error_completion = self.conversation.get_template_completion("fix_error.prompt", {
-            "working_dir": working_dir,
+            "working_dir": os.path.relpath(working_dir, self.project_path),
             "command": " ".join(command),
             "error": error,
         })

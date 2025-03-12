@@ -1,6 +1,7 @@
 from http.server import BaseHTTPRequestHandler, HTTPServer
 import json
-from agents.main_agent import ProjectAgent
+from agents.main_agent import ProjectAgent, BackendName
+
 
 class RequestHandler(BaseHTTPRequestHandler):
     def do_POST(self):
@@ -11,7 +12,7 @@ class RequestHandler(BaseHTTPRequestHandler):
                 request_json = json.loads(post_data)
                 content = request_json.get("content")
                 agent = ProjectAgent()
-                project = agent.build_frontend(content)
+                project = agent.build_project(content, BackendName.JAVA)
                 response = {
                     "projectId": project.project_id,
                     "error": project.error,

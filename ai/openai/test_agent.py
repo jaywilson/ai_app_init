@@ -4,6 +4,6 @@ from openai_utils import TestConversation
 
 def test_agent():
     agent = ProjectAgent(TestConversation())
-    agent.build_frontend("dummy user requirements")
+    agent.build_project("dummy user requirements")
 
 test_agent()
