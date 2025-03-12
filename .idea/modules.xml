@@ -2,8 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/ai/server/ai_server.iml" filepath="$PROJECT_DIR$/ai/server/ai_server.iml" />
       <module fileurl="file://$PROJECT_DIR$/frontend/frontend.iml" filepath="$PROJECT_DIR$/frontend/frontend.iml" />
-      <module fileurl="file://$PROJECT_DIR$/ai/openai/openai.iml" filepath="$PROJECT_DIR$/ai/openai/openai.iml" />
     </modules>
   </component>
 </project>

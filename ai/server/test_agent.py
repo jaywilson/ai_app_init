@@ -1,5 +1,5 @@
 from agents.main_agent import ProjectAgent
-from openai_utils import TestConversation
+from ai_utils import TestConversation
 
 
 def test_agent():

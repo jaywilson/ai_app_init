@@ -1,14 +1,16 @@
 from typing import Dict, List, Any
 
 from openai import OpenAI
+import anthropic
 import jinja2
 import utils
 
 
 class Conversation:
     def __init__(self):
-        self.jinja = jinja2.Environment(loader=jinja2.FileSystemLoader(f"{utils.APP_ROOT_DIR}/ai/openai/prompts"))
-        self.client = OpenAI()
+        self.jinja = jinja2.Environment(loader=jinja2.FileSystemLoader(f"{utils.APP_ROOT_DIR}/ai/server/prompts"))
+        self.openai_client = OpenAI()
+        self.claude_client = anthropic.Anthropic()
         self.messages: List[Dict[str, str]] = []
 
     def get_template_completion(self, template: str, template_params: Dict[str, Any]) -> str:
@@ -17,15 +19,15 @@ class Conversation:
         print(f"get_template_completion: {query}")
         message = {"role": "user", "content": query}
         # self.messages.append(message)
-        completion = self.client.chat.completions.create(
-            model="o1",
-            store=False,
+        message = self.claude_client.messages.create(
+            model="claude-3-7-sonnet-20250219",
+            max_tokens=1024,
             messages=[message]
         )
-        completion_text = completion.choices[0].message.content
+        text = message.content[0].text
         # self.messages.append({"role": "assistant", "content": completion_text})
-        print(f"completion: {completion_text}")
-        return completion_text
+        print(f"completion: {text}")
+        return text
 
     @staticmethod
     def saved_prompt():

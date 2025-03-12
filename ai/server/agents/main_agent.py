@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from enum import Enum
 from time import sleep
 
-import openai_utils
+import ai_utils
 import utils
 import os
 import shutil
@@ -42,14 +42,14 @@ class ProjectAgent:
         BackendName.KOTLIN: Backend(framework="Kotlin and the Ktor http server library", dependencies="Gradle. Gradle MUST use the application plugin. The org.jetbrains.kotlin.jvm plugin MUST use version 2.1.10."),
     }
 
-    def __init__(self, conversation: openai_utils.Conversation | None = None):
+    def __init__(self, conversation: ai_utils.Conversation | None = None):
         self.project_id = uuid.uuid4().hex
         self.project_path = ProjectAgent.get_project_path(self.project_id)
         self.project_zip_path = ProjectAgent.get_project_zip_path(self.project_id)
         self.react_app_path = os.path.join(self.project_path, 'react-app')
         self.server_path = os.path.join(self.project_path, 'server')
         self.azure = azure_utils.Azure()
-        self.conversation = conversation if conversation is not None else openai_utils.Conversation()
+        self.conversation = conversation if conversation is not None else ai_utils.Conversation()
 
     @staticmethod
     def get_project_path(project_id: str):
@@ -61,7 +61,7 @@ class ProjectAgent:
 
     def build_project(self, user_requirements: str, backend_name: BackendName) -> Project:
         template_files = utils.get_template_contents(
-            f"{utils.APP_ROOT_DIR}/ai/openai/templates/react/react-app",
+            f"{utils.APP_ROOT_DIR}/ai/server/templates/react/react-app",
             "react-app",
         )
         template_file_paths = list(template_files.keys())
