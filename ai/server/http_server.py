@@ -1,5 +1,6 @@
 from http.server import BaseHTTPRequestHandler, HTTPServer
 import json
+import traceback
 from agents.main_agent import ProjectAgent, BackendName
 
 
@@ -19,6 +20,7 @@ class RequestHandler(BaseHTTPRequestHandler):
                 }
                 self._send_json_response(response, 200)
             except json.JSONDecodeError as e:
+                print(traceback.format_exc())
                 print(f"Error: {str(e)}")
                 self._send_json_response({"error": "Invalid JSON"}, 400)     
         else:

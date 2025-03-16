@@ -1,8 +1,6 @@
 Your goal is to build a server backend for a web application based on a server API and functional requirements.
 
-Your output MUST be ONLY a JSON structure which includes ALL generated code files. The structure should be a list of objects.
-Each object should have a "filename" attribute and a "contents" attribute. All filenames MUST be under the "server" root directory.
-
+Your output MUST include only generated code file paths and their contents. The output MUST be a JSON object with one field: "files". "files" MUST contain a list of JSON objects each with two fields: "file_path" and "contents". All files MUST be in the "server" root directory.
 The backend should be written in {{ backend_framework }}.
 Dependencies should be managed with {{ dependency_framework }}.
 Data should be saved in-memory on the server.

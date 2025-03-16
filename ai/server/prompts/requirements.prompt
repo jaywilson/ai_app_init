@@ -1,6 +1,6 @@
 Your goal to extract functional requirements and backend API from the design document below.
 
-Your output should be a JSON object. It should have two fields: "requirements" and "server_api".
+Your output MUST be a Markdown JSON object. It should have two fields: "requirements" and "server_api".
 
 "requirements" should be a list of one-sentence functional requirements.
 "server_api" should be a list of HTTP paths to update state on the server

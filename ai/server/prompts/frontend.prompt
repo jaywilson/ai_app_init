@@ -1,14 +1,8 @@
 Your goal is to build a web application frontend based on a list of requirements and a server API.
 
-Your output MUST be ONLY a JSON structure which includes ALL generated code files. The structure should be a list of objects.
-Each object should have a "filename" attribute and a "contents" attribute.
-
-You must write the application frontend using React. Some frontend code has already been written. The existing file structure
-is contained in the list below:
-
----
-{{ template_files }}
----
+Your output MUST include only generated code file paths and their contents. The output MUST be a JSON object with one field: "files". "files" MUST contain a list of JSON objects each with two fields: "file_path" and "contents".
+Each file must be in the "react-app" root directory.
+You Must write the application frontend using React.
 
 For each requirement, there should usually be a separate React component.
 For each requirement, the frontend should update the backend server state by making an HTTP request.

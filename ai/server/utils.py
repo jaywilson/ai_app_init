@@ -1,21 +1,50 @@
 import re
 import json
 import os
-from typing import Dict
-
+from typing import Dict, List
 
 APP_ROOT_DIR = os.environ['APP_ROOT_DIR']
 
-def extract_all_json_blocks(text):
+
+def extract_all_json_blocks(text) -> list[dict]:
     # Find all JSON code blocks in the text
-    matches = re.findall(r"```json\s*([\s\S]*?)```", text)
+    try:
+        return [json.loads(text)]
+    except json.JSONDecodeError as e:
+        print(f"Could not decode JSON: {e}")
+        pass
+
+
+    matches = re.findall(r"```json(.*?)```", text, re.DOTALL)
+    print(f"Markdown matches {len(matches)}")
     json_blocks = []
     for match in matches:
         try:
             json_blocks.append(json.loads(match.strip()))
         except json.JSONDecodeError as e:
-           print("Error decoding JSON:", e)
+            print("Error decoding JSON:", e)
     return json_blocks
+
+
+def extract_code_blocks_with_filenames(text: str) -> List[Dict[str, str]]:
+    """
+    Extracts code blocks and their filenames from a Markdown string.
+
+    Args:
+        text (str): The input Markdown string.
+
+    Returns:
+        List[Dict[str, str]]: A list of dictionaries containing filenames and code blocks.
+    """
+    pattern = r"```(?:([\w./-]+)\s+)?([\s\S]*?)```"
+    matches = re.findall(pattern, text)
+    code_blocks = []
+    for filename, code in matches:
+        code_blocks.append({
+            "file_path": filename.strip() if filename else "unknown",
+            "contents": code.strip()
+        })
+    return code_blocks
 
 
 def get_template_contents(template_dir: str, template_name: str) -> Dict[str, str]:

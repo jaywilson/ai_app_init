@@ -21,7 +21,7 @@ class Conversation:
         # self.messages.append(message)
         message = self.claude_client.messages.create(
             model="claude-3-7-sonnet-20250219",
-            max_tokens=1024,
+            max_tokens=8192,
             messages=[message]
         )
         text = message.content[0].text

@@ -1,5 +1,6 @@
 import json
 import uuid
+import re
 from dataclasses import dataclass
 from enum import Enum
 from time import sleep
@@ -38,7 +39,7 @@ class BackendName(Enum):
 class ProjectAgent:
     OUTPUT_DIR = f"{utils.APP_ROOT_DIR}/generated_projects"
     BACKENDS = {
-        BackendName.JAVA: Backend(framework="Java and the Javalin http server library", dependencies="Maven. The server MUST run using mvn clean compile exec:java"),
+        BackendName.JAVA: Backend(framework="Java 21 and the Javalin http server library", dependencies="Gradle"),
         BackendName.KOTLIN: Backend(framework="Kotlin and the Ktor http server library", dependencies="Gradle. Gradle MUST use the application plugin. The org.jetbrains.kotlin.jvm plugin MUST use version 2.1.10."),
     }
 
@@ -60,21 +61,31 @@ class ProjectAgent:
         return os.path.join(ProjectAgent.get_project_path(project_id), "project.zip")
 
     def build_project(self, user_requirements: str, backend_name: BackendName) -> Project:
-        template_files = utils.get_template_contents(
-            f"{utils.APP_ROOT_DIR}/ai/server/templates/react/react-app",
-            "react-app",
-        )
-        template_file_paths = list(template_files.keys())
-        print(f"Template files {template_file_paths}")
+        #template_files = utils.get_template_contents(
+        #    f"{utils.APP_ROOT_DIR}/ai/server/templates/react/react-app",
+        #    "react-app",
+        #)
+        #template_file_paths = list(template_files.keys())
+        #print(f"Template files {template_file_paths}")
+        template_file_paths = []
+        template_files = {}
 
-        requirements_completion = json.loads(self.conversation.get_template_completion(
+        requirements = None
+        server_api = None
+        requirements_completion = self.conversation.get_template_completion(
             "requirements.prompt",
             {
                 "user_requirements": user_requirements,
             }
-        ))
-        requirements = requirements_completion['requirements']
-        server_api = requirements_completion['server_api']
+        )
+
+        json_blocks = utils.extract_all_json_blocks(requirements_completion)
+        for block in json_blocks:
+            requirements = block['requirements']
+            server_api = block['server_api']
+        if requirements is None or server_api is None:
+            print(f"Could not parse requirements from json {json_blocks}")
+            return Project(None, "Error: Could not parse requirements.")
 
         frontend_completion = self.conversation.get_template_completion(
             "frontend.prompt",
@@ -90,7 +101,7 @@ class ProjectAgent:
             self.react_app_path,
             [
                 Command(command=['npm', 'install']),
-                Command(command=['npm', 'start'], wait_for_complete=False, wait_timout=10, kill=True),
+                Command(command=['npm', 'start'], wait_for_complete=False, wait_timout=20, kill=True),
             ]
         )
 
@@ -102,7 +113,6 @@ class ProjectAgent:
                 "dependency_framework": self.BACKENDS[backend_name].dependencies,
             }
         )
-        print(f"Backend completion: {backend_completion}")
         self.write_project(backend_completion, [], {})
         error = self.run_and_try_fix_commands(
             self.server_path,
@@ -129,17 +139,18 @@ class ProjectAgent:
             self.write_project_file(template_file_path, contents)
 
     def write_completion_files(self, completion_text: str) -> list[str]:
-        completion_file_list = json.loads(completion_text)
-        completion_files = []
-        for file_obj in completion_file_list:
-            file_path = file_obj['filename']
-            try:
-                contents = file_obj['contents']
-                self.write_project_file(file_path, contents)
-                completion_files.append(file_path)
-            except Exception as e:
-                print(f"Error: {str(e)} File: {file_path}")
-        return completion_files
+        file_paths = []
+        blocks = utils.extract_all_json_blocks(completion_text)
+        for block in blocks:
+            for file in block["files"]:
+                file_path = file['file_path']
+                try:
+                    contents = file['contents']
+                    self.write_project_file(file_path, contents)
+                    file_paths.append(file_path)
+                except Exception as e:
+                    print(f"Error: {str(e)} File: {file_path}")
+        return file_paths
 
     def write_project_file(self, file_path: str, contents: str):
         output_path = os.path.join(self.project_path, file_path)
